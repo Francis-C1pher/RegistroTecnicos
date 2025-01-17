@@ -1,12 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
-namespace RegistroTecnicos.Components.Models
-{
-    public class Tecnicos
-    {
-        [Key]
-        public int TecnicoId { get; set; }
+namespace RegistroTecnicos.Models;
 
-        [Required(ErrorMessage = "Este campo es requerido")]
-        public string Concepto { get; set; } = null!;
-    }
+public class Tecnicos
+{
+    [Key]
+    public int TecnicoId { get; set; }
+
+    [Required(ErrorMessage = "Este campo es requerido")]
+    public string? Nombres { get; set; }
+    
+
+    public double SueldoHora {  get; set; }
+
+   
+
 }
