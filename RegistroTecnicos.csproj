@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Components\DAL\" />
-    <Folder Include="Components\Models\" />
     <Folder Include="Components\Pages\Consultas\" />
     <Folder Include="Components\Pages\Registros\" />
     <Folder Include="Components\Services\" />
