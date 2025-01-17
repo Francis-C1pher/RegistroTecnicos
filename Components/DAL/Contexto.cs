@@ -1,8 +1,8 @@
-﻿using RegistroTecnicos.Components.Models;
+﻿using RegistroTecnicos.Models;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace RegistroTecnicos.Components.DAL;
+namespace RegistroTecnicos.DAL;
 
 public class Contexto:DbContext
 {

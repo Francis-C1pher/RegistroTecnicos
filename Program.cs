@@ -1,5 +1,5 @@
 using RegistroTecnicos.Components;
-using RegistroTecnicos.Components.DAL;
+using RegistroTecnicos.DAL;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
