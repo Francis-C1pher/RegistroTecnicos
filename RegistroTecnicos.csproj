@@ -10,6 +10,7 @@
     <Folder Include="Components\Pages\Consultas\" />
     <Folder Include="Components\Pages\Registros\" />
     <Folder Include="Components\Services\" />
+    <Folder Include="Data\" />
   </ItemGroup>
 
   <ItemGroup>
