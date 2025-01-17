@@ -1,6 +1,7 @@
 using RegistroTecnicos.Components;
 using RegistroTecnicos.DAL;
 using Microsoft.EntityFrameworkCore;
+using RegistroTecnicos.Components.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,9 @@ builder.Services.AddRazorComponents()
 
 var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 
-builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr)); 
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
+
+builder.Services.AddScoped<TecnicosService>();
 
 var app = builder.Build();
 
