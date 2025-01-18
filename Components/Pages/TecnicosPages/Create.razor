@@ -1,25 +1,70 @@
-﻿<h3>Create</h3>
-@page "/Tecnico/Create"
+﻿@page "/Tecnico/Create"
+
 @inject TecnicosService tecnicosService
-@rendermode InteractiveServer
+@inject NavigationManager navigationManager
+@inject ToastService toastService
 
 @*HTML*@
-<PageTitle>Create</PageTitle>
-<EditForm Model="Tecnico" OnvalidSubmit="Guardar">
-    <DataAnnotationsValidator /> 
-    
+<PageTitle>Registrar Técnico</PageTitle>
+<EditForm Model="Tecnico" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+
     <div class="container">
         <div class="card shadow-lg">
             <div class="card-header text-center">
-                <h5 class=" card-title">Crear Tecnico</h5>
+                <h5 class="card-title">Registrar Técnico</h5>
             </div>
+
             <div class="card-body">
 
+                @*Técnico ID*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID Técnico</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Tecnico.TecnicoId"></InputNumber>
+                    <ValidationMessage For="(() => Tecnico.TecnicoId)" />
+                </div>
+
+                @*Nombres*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Nombres</strong></label>
+                    <InputText class="form-control" @bind-Value="Tecnico.Nombres"></InputText>
+                    <ValidationMessage For="(() => Tecnico.Nombres)" />
+                </div>
+
+                @*Sueldo por Hora*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Sueldo por Hora</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Tecnico.SueldoHora"></InputNumber>
+                    <ValidationMessage For="(() => Tecnico.SueldoHora)" />
+                </div>
+            </div>
+
+            @*footer*@
+            <div class="card-footer text-center mt-2">
+                <a href="/Tecnico/Index" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
             </div>
         </div>
     </div>
-
 </EditForm>
+@Mensaje
 
+@code {
+    public Tecnicos Tecnico { get; set; } = new Tecnicos();
+    public string Mensaje { get; set; } = string.Empty;
 
+    public async Task Guardar()
+    {
+        var creado = await tecnicosService.Guardar(Tecnico);
 
+        if (creado)
+        {
+            toastService.ShowSuccess("Técnico Guardado Correctamente");
+            navigationManager.NavigateTo("/Tecnico/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se pudo guardar correctamente");
+        }
+    }
+}

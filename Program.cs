@@ -2,6 +2,7 @@ using RegistroTecnicos.Components;
 using RegistroTecnicos.DAL;
 using Microsoft.EntityFrameworkCore;
 using RegistroTecnicos.Services;
+using Blazored.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 
 builder.Services.AddScoped<TecnicosService>();
+
+builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
 
