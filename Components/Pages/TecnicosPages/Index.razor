@@ -1,5 +1,113 @@
-﻿<h3>Component</h3>
+﻿@page "/Tecnico/Index"
+
+@inject TecnicosService tecnicosService
+@inject NavigationManager navigationManager
+
+<PageTitle>Registro de Técnicos</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header space-between">
+            <h5 class="card-title">Registro de Técnicos</h5>
+            <a href="/Tecnico/Create" class="btn btn-primary"> <span class="bi bi-plus-square mt-3"></span> Crear</a>
+        </div>
+
+        <div class="card-body">
+            @*labels*@ 
+            <div class="row">
+                @*Filtrar por*@ 
+                <div class="col-3">
+                    <label class="col-form-label"><strong>Filtrar por</strong></label>
+                </div>
+
+                @*ValorFiltro*@ 
+                <div class="col-4">
+                    <label class="col-form-label"><strong>B&uacute;squeda</strong></label>
+                </div>
+            </div>
+
+            @*Inputs y botones*@ 
+            <div class="row align-items-center">
+                @*filtro*@ 
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opci&oacute;n</option>
+                        <option value="TecnicoId">TecnicoId</option>
+                        <option value="Nombres">Nombres</option>
+                    </InputSelect>
+                </div>
+
+                @*Busqueda*@ 
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover">
+                <thead class="table table-striped text-black">
+                    <tr>
+                        <th>TecnicoId</th>
+                        <th>Nombres</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tecnico in ListaTecnicos)
+                    {
+                        <tr>
+                            <td>@tecnico.TecnicoId</td>
+                            <td>@tecnico.Nombres</td>
+                            <td class="text-center">
+                                <a href="/Tecnico/Edit/@tecnico.TecnicoId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer space-between">
+            <label>Cantidad:  @ListaTecnicos.Count()</label>
+        </div>
+    </div>
+</div>
 
 @code {
+    public List<Tecnicos> ListaTecnicos { get; set; } = new List<Tecnicos>();
 
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0); // Cargar todos los técnicos
+    }
+
+    private async Task Buscar()
+    {
+        if (ValorFiltro.Trim() != "")
+        {
+            if (Filtro == "TecnicoId")
+            {
+                ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId.ToString().Contains(ValorFiltro));
+            }
+            else if (Filtro == "Nombres")
+            {
+                ListaTecnicos = await tecnicosService.Listar(t => (t.Nombres != null && t.Nombres.ToLower().Contains(ValorFiltro.ToLower()))
+     );
+
+            }
+        }
+        else
+            ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);  // Restablecer la lista
+    }
+
+    private async Task Restablecer()
+    {
+        ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);  // Cargar todos los técnicos
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+    }
 }
+
