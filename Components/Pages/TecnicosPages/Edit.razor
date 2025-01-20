@@ -1,5 +1,112 @@
-﻿<h3>Edit</h3>
+﻿@page "/Tecnico/Edit/{TecnicoId:int}"
+
+@inject TecnicosService tecnicosService
+@inject ToastService toastService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@*HTML*@
+<PageTitle>Modificar Técnico</PageTitle>
+<EditForm Model="Tecnico" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Modificar Técnico</h5>
+            </div>
+
+            <div class="card-body">
+                @*Técnico*@ 
+                <div class="mb-3">
+                    <label class="form-label"><strong>Técnico</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Tecnico.TecnicoId">
+                        <option value="" selected disabled>Elija una opción</option>
+                        @foreach (var tecnico in ListaTecnicos)
+                        {
+                            <option value="@tecnico.TecnicoId">@tecnico.Nombres</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Tecnico.TecnicoId)" />
+                </div>
+
+                @*Nombres*@ 
+                <div class="mb-3">
+                    <label class="form-label"><strong>Nombres</strong></label>
+                    <InputText class="form-control" @bind-Value="Tecnico.Nombres"></InputText>
+                    <ValidationMessage For="(() => Tecnico.Nombres)" />
+                </div>
+
+                @*Sueldo por hora*@ 
+                <div class="mb-3">
+                    <label class="form-label"><strong>Sueldo por Hora</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Tecnico.SueldoHora"></InputNumber>
+                    <ValidationMessage For="(() => Tecnico.SueldoHora)" />
+                </div>
+            </div>
+
+            @*footer*@ 
+            <div class="card-footer text-center mt-2">
+                <a href="/Tecnico/Index" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Modificar</button>
+                <button type="button" class="btn btn-danger bi bi-trash" @onclick="Eliminar"> Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
 
 @code {
+    [Parameter]
+    public int TecnicoId { get; set; }
 
+    public Tecnicos Tecnico { get; set; } = new Tecnicos();
+    public string Mensaje { get; set; } = string.Empty;
+    public List<Tecnicos> ListaTecnicos { get; set; } = new List<Tecnicos>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tecnico = await tecnicosService.Buscar(TecnicoId);
+
+        if (Tecnico == null)
+        {
+            
+            toastService.ShowError("Técnico no encontrado.");
+            navigationManager.NavigateTo("/Tecnico/Index");
+            return;
+        }
+
+        ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);
+    }
+
+    public async Task Modificar()
+    {
+        var modificado = await tecnicosService.Guardar(Tecnico);
+
+        if (modificado)
+        {
+            toastService.ShowSuccess("Se ha modificado correctamente");
+        }
+        else
+        {
+            toastService.ShowError("No se ha podido modificar correctamente");
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        var eliminado = await tecnicosService.Eliminar(Tecnico.TecnicoId);
+
+        if (eliminado)
+        {
+            toastService.ShowSuccess("Se ha eliminado correctamente");
+            navigationManager.NavigateTo("/Tecnico/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se ha podido eliminar correctamente");
+        }
+    }
 }
