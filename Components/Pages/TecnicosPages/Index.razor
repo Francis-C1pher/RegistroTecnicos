@@ -2,12 +2,13 @@
 
 @inject TecnicosService tecnicosService
 @inject NavigationManager navigationManager
+@rendermode InteractiveServer
 
-<PageTitle>Registro de Técnicos</PageTitle>
+<PageTitle>Registro de T&eacute;cnicos</PageTitle>
 <div class="container">
     <div class="card shadow-lg">
         <div class="card-header space-between">
-            <h5 class="card-title">Registro de Técnicos</h5>
+            <h5 class="card-title">Registro de T&eacute;cnicos</h5>
             <a href="/Tecnico/Create" class="btn btn-primary"> <span class="bi bi-plus-square mt-3"></span> Crear</a>
         </div>
 
@@ -50,10 +51,15 @@
                     <tr>
                         <th>TecnicoId</th>
                         <th>Nombres</th>
-                        <th>Opciones</th>
+                        <th>SueldoHora</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+
                     </tr>
                 </thead>
                 <tbody>
+                    @if(ListaTecnicos.Any())
+                    {
                     @foreach (var tecnico in ListaTecnicos)
                     {
                         <tr>
@@ -63,7 +69,14 @@
                                 <a href="/Tecnico/Edit/@tecnico.TecnicoId" class="btn btn-outline-primary bi bi-pencil-square"></a>
                             </td>
                         </tr>
+                         }
                     }
+                    else{
+                        <tr>
+                            <td colspan="5" class="text-center"> No existen T&eacutecnicos registrados;</td>
+                        </tr>
+                    }
+
                 </tbody>
             </table>
         </div>
@@ -108,6 +121,15 @@
         ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);  // Cargar todos los técnicos
         Filtro = string.Empty;
         ValorFiltro = string.Empty;
+    }
+
+    private async Task Eliminar(int tecnicoId)
+    {
+        var confirmado = await tecnicosService.Eliminar(tecnicoId);
+        if(confirmado)
+        {
+            ListaTecnicos.RemoveAll(t => t.TecnicoId == tecnicoId);
+        }
     }
 }
 

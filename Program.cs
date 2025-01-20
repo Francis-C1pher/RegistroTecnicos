@@ -18,6 +18,8 @@ builder.Services.AddScoped<TecnicosService>();
 
 builder.Services.AddBlazoredToast();
 
+builder.Services.AddBlazorBootstrap();
+
 var app = builder.Build();
 
 

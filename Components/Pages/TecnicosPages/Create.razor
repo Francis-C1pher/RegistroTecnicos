@@ -1,12 +1,14 @@
 ﻿@page "/Tecnico/Create"
 
+@rendermode InteractiveServer
 @inject TecnicosService tecnicosService
 @inject NavigationManager navigationManager
-@inject ToastService toastService
+
 
 @*HTML*@
 <PageTitle>Registrar Técnico</PageTitle>
-<EditForm Model="Tecnico" OnValidSubmit="Guardar">
+<EditForm Model="Tecnico" OnSubmit="Guardar" FormName="CreateTecnicoForm">
+
     <DataAnnotationsValidator />
 
     <div class="container">
@@ -47,24 +49,60 @@
         </div>
     </div>
 </EditForm>
-@Mensaje
+@*Mensaje*@
 
 @code {
-    public Tecnicos Tecnico { get; set; } = new Tecnicos();
-    public string Mensaje { get; set; } = string.Empty;
+    public Tecnicos? Tecnico { get; set; } = new Tecnicos();
+    private int UltimoTecnico;
+    List<ToastMessage> Mensajes = new List<ToastMessage>();
+
+    protected override async Task OnInitializedAsync()
+    {
+     
+    }
 
     public async Task Guardar()
     {
-        var creado = await tecnicosService.Guardar(Tecnico);
-
-        if (creado)
+        if (!await Validar())
         {
-            toastService.ShowSuccess("Técnico Guardado Correctamente");
-            navigationManager.NavigateTo("/Tecnico/Index");
+            var nuevo = await tecnicosService.Guardar(Tecnico);
+            if (nuevo)
+            {
+                MostrarMensaje(ToastType.Success,
+                    $"Técnico {Tecnico.Nombres} ha sido creado correctamente.");
+                Tecnico = new Tecnicos();
+               
+            }
+            else
+            {
+                MostrarMensaje(ToastType.Danger, "Técnico no se ha podido crear correctamente.");
+            }
         }
         else
         {
-            toastService.ShowError("No se pudo guardar correctamente");
+            MostrarMensaje(ToastType.Warning, "Ya existe un técnico con este nombre.");
         }
     }
+
+    public async Task<bool> Validar()
+    {
+        var existe = await tecnicosService.Existe(Tecnico.TecnicoId, Tecnico.Nombres);
+        return existe;
+    }
+
+    private void MostrarMensaje(ToastType toastType, string message)
+    {
+        Mensajes.Add(CrearMensaje(toastType, message));
+    }
+
+    private ToastMessage CrearMensaje(ToastType toastType, string message)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Title = "Notificación",
+            HelpText = $"{DateTime.Now}",
+            Message = message,
+        };
+
+    public void Volver()=> navigationManager.NavigateTo("/Tecnico/Index");
 }

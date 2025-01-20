@@ -15,6 +15,12 @@ namespace RegistroTecnicos.Services
             return await contexto.Tecnicos
                 .AnyAsync(p => p.TecnicoId == TecnicoId);
         }
+        public async Task<bool> Existe(int tecnicoId, string? nombres)
+        {
+            await using var contexto = await DbFactory.CreateDbContextAsync();
+            return await contexto.Tecnicos
+                .AnyAsync(t => t.TecnicoId != tecnicoId && t.Nombres.ToLower().Equals(nombres.ToLower()));
+        }
 
         private async Task<bool> Insertar(Tecnicos Tecnico)
         {
