@@ -60,16 +60,22 @@
                 <tbody>
                     @if(ListaTecnicos.Any())
                     {
-                    @foreach (var tecnico in ListaTecnicos)
-                    {
-                        <tr>
-                            <td>@tecnico.TecnicoId</td>
-                            <td>@tecnico.Nombres</td>
-                            <td class="text-center">
-                                <a href="/Tecnico/Edit/@tecnico.TecnicoId" class="btn btn-outline-primary bi bi-pencil-square"></a>
-                            </td>
-                        </tr>
-                         }
+                        @foreach (var tecnico in ListaTecnicos)
+                        {
+                            <tr>
+                                <td>@tecnico.TecnicoId</td>
+                                <td>@tecnico.Nombres</td>
+                                <td>@tecnico.SueldoHora</td>
+                                <td class="text-center">
+                                    <a href="/Tecnico/Edit/@tecnico.TecnicoId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                                </td>
+
+                                <td class="text-center">
+                                    <a href="/Tecnico/Delete/@tecnico.TecnicoId" class="btn btn-outline-danger bi bi-trash3"></a>
+                                </td>
+
+                            </tr>
+                        }
                     }
                     else{
                         <tr>
@@ -103,12 +109,11 @@
         {
             if (Filtro == "TecnicoId")
             {
-                ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId.ToString().Contains(ValorFiltro));
+                ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId.ToString().Contains(ValorFiltro.ToLower()));
             }
             else if (Filtro == "Nombres")
             {
-                ListaTecnicos = await tecnicosService.Listar(t => (t.Nombres != null && t.Nombres.ToLower().Contains(ValorFiltro.ToLower()))
-     );
+                ListaTecnicos = await tecnicosService.Listar(t => t.Nombres != null && t.Nombres.ToLower().Contains(ValorFiltro.ToLower()));
 
             }
         }

@@ -1,15 +1,14 @@
 ﻿@page "/Tecnico/Create"
-
 @rendermode InteractiveServer
 @inject TecnicosService tecnicosService
 @inject NavigationManager navigationManager
+@inject IToastService toastService
 
-
-@*HTML*@
 <PageTitle>Registrar Técnico</PageTitle>
-<EditForm Model="Tecnico" OnSubmit="Guardar" FormName="CreateTecnicoForm">
 
+<EditForm Model="Tecnico" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
+    <ValidationSummary />
 
     <div class="container">
         <div class="card shadow-lg">
@@ -18,22 +17,21 @@
             </div>
 
             <div class="card-body">
-
-                @*Técnico ID*@
+                <!-- Técnico ID -->
                 <div class="mb-3">
                     <label class="form-label"><strong>ID Técnico</strong></label>
-                    <InputNumber class="form-control" @bind-Value="Tecnico.TecnicoId"></InputNumber>
+                    <InputNumber disabled readonly class="form-control" @bind-Value="Tecnico.TecnicoId"></InputNumber> @*El ID nunca deberia modificarse*@
                     <ValidationMessage For="(() => Tecnico.TecnicoId)" />
                 </div>
 
-                @*Nombres*@
+                <!-- Nombres -->
                 <div class="mb-3">
                     <label class="form-label"><strong>Nombres</strong></label>
                     <InputText class="form-control" @bind-Value="Tecnico.Nombres"></InputText>
                     <ValidationMessage For="(() => Tecnico.Nombres)" />
                 </div>
 
-                @*Sueldo por Hora*@
+                <!-- Sueldo por Hora -->
                 <div class="mb-3">
                     <label class="form-label"><strong>Sueldo por Hora</strong></label>
                     <InputNumber class="form-control" @bind-Value="Tecnico.SueldoHora"></InputNumber>
@@ -41,68 +39,45 @@
                 </div>
             </div>
 
-            @*footer*@
             <div class="card-footer text-center mt-2">
-                <a href="/Tecnico/Index" class="btn btn-secondary"> <span class="bi bi-arrow-left"></span> Volver</a>
+                <a href="/Tecnico/Index" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
                 <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
             </div>
         </div>
     </div>
 </EditForm>
-@*Mensaje*@
+
+<p>@Mensaje</p>
 
 @code {
-    public Tecnicos? Tecnico { get; set; } = new Tecnicos();
-    private int UltimoTecnico;
-    List<ToastMessage> Mensajes = new List<ToastMessage>();
+    public Tecnicos Tecnico { get; set; } = new Tecnicos();
+    public string Mensaje { get; set; } = string.Empty;
+    
 
-    protected override async Task OnInitializedAsync()
+    private async Task Guardar()
     {
-     
-    }
-
-    public async Task Guardar()
-    {
-        if (!await Validar())
+        try
         {
-            var nuevo = await tecnicosService.Guardar(Tecnico);
-            if (nuevo)
+            var creado = await tecnicosService.Guardar(Tecnico);
+
+            if (creado)
             {
-                MostrarMensaje(ToastType.Success,
-                    $"Técnico {Tecnico.Nombres} ha sido creado correctamente.");
-                Tecnico = new Tecnicos();
-               
+                toastService.ShowSuccess("Técnico guardado correctamente");
+                navigationManager.NavigateTo("/Tecnico/Index");
             }
             else
             {
-                MostrarMensaje(ToastType.Danger, "Técnico no se ha podido crear correctamente.");
+                toastService.ShowError("No se pudo guardar el técnico");
             }
         }
-        else
+        catch (Exception ex)
         {
-            MostrarMensaje(ToastType.Warning, "Ya existe un técnico con este nombre.");
+            Mensaje = $"Error: {ex.Message}";
+            toastService.ShowError("Ocurrió un error al guardar el técnico");
         }
+
+
     }
-
-    public async Task<bool> Validar()
-    {
-        var existe = await tecnicosService.Existe(Tecnico.TecnicoId, Tecnico.Nombres);
-        return existe;
-    }
-
-    private void MostrarMensaje(ToastType toastType, string message)
-    {
-        Mensajes.Add(CrearMensaje(toastType, message));
-    }
-
-    private ToastMessage CrearMensaje(ToastType toastType, string message)
-    => new ToastMessage
-        {
-            Type = toastType,
-            Title = "Notificación",
-            HelpText = $"{DateTime.Now}",
-            Message = message,
-        };
-
-    public void Volver()=> navigationManager.NavigateTo("/Tecnico/Index");
 }
