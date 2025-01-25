@@ -1,0 +1,64 @@
+﻿@page "/Tecnico/Delete/{TecnicoId:int}"
+
+@inject TecnicosService tecnicosService
+@inject IToastService toastService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@*HTML*@
+<PageTitle>Eliminar Técnico</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header text-center">
+            <h5 class="card-title">Eliminar Técnico</h5>
+        </div>
+
+        <div class="card-body text-center">
+            <p><strong>¿Está seguro de que desea eliminar el siguiente técnico?</strong></p>
+
+            <p><strong>ID:</strong> @Tecnico.TecnicoId</p>
+            <p><strong>Nombre:</strong> @Tecnico.Nombres</p>
+            <p><strong>Sueldo por Hora:</strong> @Tecnico.SueldoHora</p>
+        </div>
+
+        <div class="card-footer text-center mt-2">
+            <a href="/Tecnico/Index" class="btn btn-secondary">
+                <span class="bi bi-arrow-left"></span> Cancelar
+            </a>
+            <button class="btn btn-danger bi bi-trash" @onclick="ConfirmarEliminar"> Eliminar</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int TecnicoId { get; set; }
+    public Tecnicos Tecnico { get; set; } = new Tecnicos();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Tecnico = await tecnicosService.Buscar(TecnicoId);
+
+        if (Tecnico == null)
+        {
+            toastService.ShowError("Técnico no encontrado.");
+            navigationManager.NavigateTo("/Tecnico/Index");
+            return;
+        }
+    }
+
+    private async Task ConfirmarEliminar()
+    {
+        var eliminado = await tecnicosService.Eliminar(Tecnico.TecnicoId);
+
+        if (eliminado)
+        {
+            toastService.ShowSuccess("Técnico eliminado correctamente.");
+            navigationManager.NavigateTo("/Tecnico/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se pudo eliminar el técnico.");
+        }
+    }
+}
