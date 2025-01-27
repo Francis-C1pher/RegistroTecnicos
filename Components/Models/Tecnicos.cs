@@ -7,11 +7,6 @@ public class Tecnicos
     public int TecnicoId { get; set; }
 
     [Required(ErrorMessage = "Este campo es requerido")]
-    public string? Nombres { get; set; }
-    
-
+    public string Nombres { get; set; } = string.Empty;
     public double SueldoHora {  get; set; }
-
-   
-
 }

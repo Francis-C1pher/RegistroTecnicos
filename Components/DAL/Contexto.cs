@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RegistroTecnicos.DAL;
 
-public class Contexto:DbContext
+public class Contexto : DbContext
 {
 
     public Contexto(DbContextOptions<Contexto> options) : base(options) { }
