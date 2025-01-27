@@ -15,7 +15,7 @@ namespace RegistroTecnicos.Models
         public double LimiteCredito { get; set; }
 
         [Required(ErrorMessage = "Este campo es requerido")]
-        public String FechaIngreso { get; set; }
+        public DateTime FechaIngreso { get; set; }
 
         [Required(ErrorMessage = "Debe añadir el RNC.")]
         [RegularExpression(@"^[0-9]{9}$", ErrorMessage = "El Rnc debe contar con 9 dijitos")]

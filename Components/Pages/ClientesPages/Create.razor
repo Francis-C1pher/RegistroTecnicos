@@ -1,5 +1,101 @@
-﻿<h3>Create</h3>
+﻿@page "/Cliente/Create"
+@rendermode InteractiveServer
+@inject ClientesService clientesService
+@inject NavigationManager navigationManager
+@inject IToastService toastService
+
+<PageTitle>Registrar Cliente</PageTitle>
+
+<EditForm Model="Cliente" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Registrar Cliente</h5>
+            </div>
+
+            <div class="card-body">
+                <!-- Cliente ID -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID Cliente</strong></label>
+                    <InputNumber disabled readonly class="form-control" @bind-Value="Cliente.ClienteId"></InputNumber>
+                    <ValidationMessage For="(() => Cliente.ClienteId)" />
+                </div>
+
+                <!-- Nombres -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>Nombres</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Nombres"></InputText>
+                    <ValidationMessage For="(() => Cliente.Nombres)" />
+                </div>
+
+                <!-- RNC -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>RNC</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Rnc"></InputText>
+                    <ValidationMessage For="(() => Cliente.Rnc)" />
+                </div>
+
+                <!-- Limite de Crédito -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>Límite de Crédito</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Cliente.LimiteCredito"></InputNumber>
+                    <ValidationMessage For="(() => Cliente.LimiteCredito)" />
+                </div>
+
+                <!-- Fecha de Ingreso -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha de Ingreso</strong></label>
+                    <InputDate class="form-control" @bind-Value="Cliente.FechaIngreso"></InputDate>
+                    <ValidationMessage For="(() => Cliente.FechaIngreso)" />
+                </div>
+
+                <!-- Dirección -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>Dirección</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Direccion"></InputText>
+                    <ValidationMessage For="(() => Cliente.Direccion)" />
+                </div>
+            </div>
+
+            <div class="card-footer text-center mt-2">
+                <a href="/Cliente/Index" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+<p>@Mensaje</p>
 
 @code {
+    public Clientes Cliente { get; set; } = new Clientes();
+    public string Mensaje { get; set; } = string.Empty;
 
+    private async Task Guardar()
+    {
+        try
+        {
+            var creado = await clientesService.Guardar(Cliente);
+
+            if (creado)
+            {
+                toastService.ShowSuccess("Cliente guardado correctamente");
+                navigationManager.NavigateTo("/Cliente/Index");
+            }
+            else
+            {
+                toastService.ShowError("No se pudo guardar el cliente");
+            }
+        }
+        catch (Exception ex)
+        {
+            Mensaje = $"Error: {ex.Message}";
+            toastService.ShowError("Ocurrió un error al guardar el cliente");
+        }
+    }
 }
