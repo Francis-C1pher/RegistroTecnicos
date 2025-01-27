@@ -1,5 +1,152 @@
-﻿<h3>Index</h3>
+﻿@page "/Cliente/Index"
+
+@inject ClientesService clientesService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Registro de Clientes</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header space-between">
+            <h5 class="card-title">Registro de Clientes</h5>
+            <a href="/Cliente/Create" class="btn btn-primary"> <span class="bi bi-plus-square mt-3"></span> Crear</a>
+        </div>
+
+        <div class="card-body">
+            @*Labels*@ 
+            <div class="row">
+                @*Filtrar por*@ 
+                <div class="col-3">
+                    <label class="col-form-label"><strong>Filtrar por</strong></label>
+                </div>
+
+                @*ValorFiltro*@ 
+                <div class="col-4">
+                    <label class="col-form-label"><strong>Búsqueda</strong></label>
+                </div>
+            </div>
+
+            @*Inputs y botones*@ 
+            <div class="row align-items-center">
+                @*Filtro*@ 
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opción</option>
+                        <option value="ClienteId">ClienteId</option>
+                        <option value="Nombres">Nombres</option>
+                        <option value="Rnc">RNC</option>
+                    </InputSelect>
+                </div>
+
+                @*Busqueda*@ 
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover">
+                <thead class="table table-striped text-black">
+                    <tr>
+                        <th>ClienteId</th>
+                        <th>Nombres</th>
+                        <th>RNC</th>
+                        <th>Limite Crédito</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Dirección</th>
+                        <th>TecnicoId</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ListaClientes.Any())
+                    {
+                        @foreach (var cliente in ListaClientes)
+                        {
+                            <tr>
+                                <td>@cliente.ClienteId</td>
+                                <td>@cliente.Nombres</td>
+                                <td>@cliente.Rnc</td>
+                                <td>@cliente.LimiteCredito:C</td>
+                                <td>@cliente.FechaIngreso</td>
+                                <td>@cliente.Direccion</td>
+                                <td>@cliente.TecnicoId</td>
+                                <td class="text-center">
+                                    <a href="/Cliente/Edit/@cliente.ClienteId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                                </td>
+
+                                <td class="text-center">
+                                    <a href="/Cliente/Delete/@cliente.ClienteId" class="btn btn-outline-danger bi bi-trash3"></a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center">No existen Clientes registrados</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer space-between">
+            <label>Cantidad: @ListaClientes.Count()</label>
+        </div>
+    </div>
+</div>
 
 @code {
+    public List<Clientes> ListaClientes { get; set; } = new List<Clientes>();
 
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaClientes = await clientesService.Listar(c => c.ClienteId > 0); // Cargar todos los clientes
+    }
+
+    private async Task Buscar()
+    {
+        if (ValorFiltro.Trim() != "")
+        {
+            if (Filtro == "ClienteId")
+            {
+                ListaClientes = await clientesService.Listar(c => c.ClienteId.ToString().Contains(ValorFiltro.ToLower()));
+            }
+            else if (Filtro == "Nombres")
+            {
+                ListaClientes = await clientesService.Listar(c => c.Nombres != null && c.Nombres.ToLower().Contains(ValorFiltro.ToLower()));
+            }
+            else if (Filtro == "Rnc")
+            {
+                ListaClientes = await clientesService.Listar(c => c.Rnc != null && c.Rnc.ToLower().Contains(ValorFiltro.ToLower()));
+            }
+        }
+        else
+        {
+            ListaClientes = await clientesService.Listar(c => c.ClienteId > 0); // Restablecer la lista
+        }
+    }
+
+    private async Task Restablecer()
+    {
+        ListaClientes = await clientesService.Listar(c => c.ClienteId > 0); // Cargar todos los clientes
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+    }
+
+    private async Task Eliminar(int clienteId)
+    {
+        var confirmado = await clientesService.Eliminar(clienteId);
+        if (confirmado)
+        {
+            ListaClientes.RemoveAll(c => c.ClienteId == clienteId);
+        }
+    }
 }

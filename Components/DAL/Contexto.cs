@@ -1,6 +1,6 @@
 ﻿using RegistroTecnicos.Models;
 using Microsoft.EntityFrameworkCore;
-using RegistroTecnicos.Components.Models;
+using RegistroTecnicos.Models;
 
 
 namespace RegistroTecnicos.DAL;

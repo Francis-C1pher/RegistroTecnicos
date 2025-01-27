@@ -1,7 +1,7 @@
 ﻿using RegistroTecnicos.DAL;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using RegistroTecnicos.Components.Models;
+using RegistroTecnicos.Models;
 using Microsoft.Identity.Client;
 
 
