@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using RegistroTecnicos.Components.Models;
+using Microsoft.Identity.Client;
 
 
 namespace RegistroTecnicos.Services;
@@ -19,16 +20,20 @@ public class ClientesService
 
     private async Task<bool> Existe(int ClienteId)
     {
+        
         await using var contexto = await _DbFactory.CreateDbContextAsync();
         return await contexto.Clientes
             .AnyAsync(c => c.ClienteId == ClienteId);
     }
 
-    public async Task<bool> Existe(int clienteId, string nombres)
+    public async Task<bool> Existe(int clienteId, string nombres, string Rnc)
     {
+
         await using var contexto = await _DbFactory.CreateDbContextAsync();
         return await contexto.Clientes
-            .AnyAsync(c => c.ClienteId != clienteId && c.Nombres.ToLower() == nombres.ToLower());
+           .AnyAsync(c => c.ClienteId != clienteId
+                && (c.Nombres.ToLower() == nombres.ToLower()
+                || c.Rnc == Rnc));
     }
 
     private async Task<bool> Insertar(Clientes cliente)
