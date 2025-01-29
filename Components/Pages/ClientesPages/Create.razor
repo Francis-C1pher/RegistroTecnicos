@@ -3,6 +3,7 @@
 @inject ClientesService clientesService
 @inject NavigationManager navigationManager
 @inject IToastService toastService
+@inject TecnicosService tecnicosService
 
 <PageTitle>Registrar Cliente</PageTitle>
 
@@ -58,6 +59,22 @@
                     <InputText class="form-control" @bind-Value="Cliente.Direccion"></InputText>
                     <ValidationMessage For="(() => Cliente.Direccion)" />
                 </div>
+
+
+                <!-- Técnico Asignado -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>Técnico Asignado</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Cliente.TecnicoId">
+                        <option value="" disabled selected>Seleccione un técnico</option>
+                        @foreach (var tecnico in ListaTecnicos)
+                        {
+                            <option value="@tecnico.TecnicoId">@tecnico.Nombres</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Cliente.TecnicoId)" />
+                </div>
+
+
             </div>
 
             <div class="card-footer text-center mt-2">
@@ -75,6 +92,13 @@
 @code {
     public Clientes Cliente { get; set; } = new Clientes();
     public string Mensaje { get; set; } = string.Empty;
+    public List<Tecnicos> ListaTecnicos { get; set; } = new List<Tecnicos>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaTecnicos = await tecnicosService.Listar(t => t.TecnicoId > 0);
+    }
+
 
     private async Task Guardar()
     {
