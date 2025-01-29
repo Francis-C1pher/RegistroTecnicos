@@ -1,5 +1,65 @@
-﻿<h3>Delete</h3>
+﻿@page "/Cliente/Delete/{ClienteId:int}"
+
+@inject ClientesService clientesService
+@inject IToastService toastService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@*HTML*@
+<PageTitle>Eliminar Cliente</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header text-center">
+            <h5 class="card-title">Eliminar Cliente</h5>
+        </div>
+
+        <div class="card-body text-center">
+            <p><strong>¿Está seguro de que desea eliminar el siguiente cliente?</strong></p>
+
+            <p><strong>ID:</strong> @Cliente.ClienteId</p>
+            <p><strong>Nombre:</strong> @Cliente.Nombres</p>
+            <p><strong>RNC:</strong> @Cliente.Rnc</p>
+            <p><strong>Fecha de Ingreso:</strong> @Cliente.FechaIngreso.ToString("yyyy-MM-dd")</p>
+        </div>
+
+        <div class="card-footer text-center mt-2">
+            <a href="/Cliente/Index" class="btn btn-secondary">
+                <span class="bi bi-arrow-left"></span> Cancelar
+            </a>
+            <button class="btn btn-danger bi bi-trash" @onclick="ConfirmarEliminar"> Eliminar</button>
+        </div>
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes Cliente { get; set; } = new Clientes();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Cliente = await clientesService.Buscar(ClienteId);
+
+        if (Cliente == null)
+        {
+            toastService.ShowError("Cliente no encontrado.");
+            navigationManager.NavigateTo("/Cliente/Index");
+            return;
+        }
+    }
+
+    private async Task ConfirmarEliminar()
+    {
+        var eliminado = await clientesService.Eliminar(Cliente.ClienteId);
+
+        if (eliminado)
+        {
+            toastService.ShowSuccess("Cliente eliminado correctamente.");
+            navigationManager.NavigateTo("/Cliente/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se pudo eliminar el cliente.");
+        }
+    }
 }
