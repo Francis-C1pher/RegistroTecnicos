@@ -1,0 +1,135 @@
+﻿@page "/Ticket/Edit/{TicketId:int}"
+
+@inject TicketsService ticketsService
+@inject IToastService toastService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@*HTML*@
+<PageTitle>Modificar Ticket</PageTitle>
+<EditForm Model="Ticket" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Modificar Ticket</h5>
+            </div>
+
+            <div class="card-body">
+                @*Ticket ID*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID Ticket</strong></label>
+                    <InputNumber disabled readonly class="form-control" @bind-Value="Ticket.TicketId"></InputNumber>
+                    <ValidationMessage For="(() => Ticket.TicketId)" />
+                </div>
+
+                @*Fecha*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate class="form-control" @bind-Value="Ticket.Fecha" />
+                    <ValidationMessage For="(() => Ticket.Fecha)" />
+                </div>
+
+                @*Cliente ID*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID Cliente</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Ticket.ClienteId"></InputNumber>
+                    <ValidationMessage For="(() => Ticket.ClienteId)" />
+                </div>
+
+                @*Técnico ID*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID Técnico</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Ticket.TecnicoId"></InputNumber>
+                    <ValidationMessage For="(() => Ticket.TecnicoId)" />
+                </div>
+
+                @*Prioridad*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Prioridad</strong></label>
+                    <InputText class="form-control" @bind-Value="Ticket.Prioridad"></InputText>
+                    <ValidationMessage For="(() => Ticket.Prioridad)" />
+                </div>
+
+                @*Asunto*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Asunto</strong></label>
+                    <InputText class="form-control" @bind-Value="Ticket.Asunto"></InputText>
+                    <ValidationMessage For="(() => Ticket.Asunto)" />
+                </div>
+
+                @*Descripción*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Descripción</strong></label>
+                    <InputTextArea class="form-control" @bind-Value="Ticket.Descripcion"></InputTextArea>
+                    <ValidationMessage For="(() => Ticket.Descripcion)" />
+                </div>
+
+                @*Tiempo Invertido*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Tiempo Invertido (horas)</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Ticket.TiempoInvertido"></InputNumber>
+                    <ValidationMessage For="(() => Ticket.TiempoInvertido)" />
+                </div>
+            </div>
+
+            @*footer*@
+            <div class="card-footer text-center mt-2">
+                <a href="/Ticket/Index" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Modificar</button>
+                <button type="button" class="btn btn-danger bi bi-trash" @onclick="Eliminar"> Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int TicketId { get; set; }
+    public Tickets Ticket { get; set; } = new Tickets();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ticket = await ticketsService.Buscar(TicketId);
+
+        if (Ticket == null)
+        {
+            toastService.ShowError("Ticket no encontrado.");
+            navigationManager.NavigateTo("/Ticket/Index");
+            return;
+        }
+    }
+
+    public async Task Modificar()
+    {
+        var modificado = await ticketsService.Guardar(Ticket);
+
+        if (modificado)
+        {
+            toastService.ShowSuccess("Se ha modificado correctamente");
+        }
+        else
+        {
+            toastService.ShowError("No se ha podido modificar correctamente");
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        var eliminado = await ticketsService.Eliminar(Ticket.TicketId);
+
+        if (eliminado)
+        {
+            toastService.ShowSuccess("Se ha eliminado correctamente");
+            navigationManager.NavigateTo("/Ticket/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se ha podido eliminar correctamente");
+        }
+    }
+}
