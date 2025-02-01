@@ -1,0 +1,68 @@
+﻿@page "/Ticket/Delete/{TicketId:int}"
+
+@inject TicketsService ticketsService
+@inject IToastService toastService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@*HTML*@
+<PageTitle>Eliminar Ticket</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header text-center">
+            <h5 class="card-title">Eliminar Ticket</h5>
+        </div>
+
+        <div class="card-body text-center">
+            <p><strong>¿Está seguro de que desea eliminar el siguiente ticket?</strong></p>
+
+            <p><strong>ID:</strong> @Ticket.TicketId</p>
+            <p><strong>Fecha:</strong> @Ticket.Fecha.ToString("yyyy-MM-dd")</p>
+            <p><strong>Cliente ID:</strong> @Ticket.ClienteId</p>
+            <p><strong>Técnico ID:</strong> @Ticket.TecnicoId</p>
+            <p><strong>Prioridad:</strong> @Ticket.Prioridad</p>
+            <p><strong>Asunto:</strong> @Ticket.Asunto</p>
+            <p><strong>Tiempo Invertido:</strong> @Ticket.TiempoInvertido horas</p>
+        </div>
+
+        <div class="card-footer text-center mt-2">
+            <a href="/Ticket/Index" class="btn btn-secondary">
+                <span class="bi bi-arrow-left"></span> Cancelar
+            </a>
+            <button class="btn btn-danger bi bi-trash" @onclick="ConfirmarEliminar"> Eliminar</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int TicketId { get; set; }
+    public Tickets Ticket { get; set; } = new Tickets();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ticket = await ticketsService.Buscar(TicketId);
+
+        if (Ticket == null)
+        {
+            toastService.ShowError("Ticket no encontrado.");
+            navigationManager.NavigateTo("/Ticket/Index");
+            return;
+        }
+    }
+
+    private async Task ConfirmarEliminar()
+    {
+        var eliminado = await ticketsService.Eliminar(Ticket.TicketId);
+
+        if (eliminado)
+        {
+            toastService.ShowSuccess("Ticket eliminado correctamente.");
+            navigationManager.NavigateTo("/Ticket/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se pudo eliminar el ticket.");
+        }
+    }
+}
