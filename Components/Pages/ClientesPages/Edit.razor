@@ -1,0 +1,110 @@
+﻿@page "/Cliente/Edit/{ClienteId:int}"
+
+@inject ClientesService clientesService
+@inject IToastService toastService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@*HTML*@
+<PageTitle>Modificar Cliente</PageTitle>
+<EditForm Model="Cliente" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Modificar Cliente</h5>
+            </div>
+
+            <div class="card-body">
+                @*Cliente ID*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID Cliente</strong></label>
+                    <InputNumber disabled readonly class="form-control" @bind-Value="Cliente.ClienteId"></InputNumber>
+                    <ValidationMessage For="(() => Cliente.ClienteId)" />
+                </div>
+
+                @*Nombres*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Nombres</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Nombres"></InputText>
+                    <ValidationMessage For="(() => Cliente.Nombres)" />
+                </div>
+
+                
+
+                @*RNC*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>RNC</strong></label>
+                    <InputText class="form-control" @bind-Value="Cliente.Rnc"></InputText>
+                    <ValidationMessage For="(() => Cliente.Rnc)" />
+                </div>
+
+                @*Fecha de Ingreso*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>Fecha de Ingreso</strong></label>
+                    <InputDate class="form-control" @bind-Value="Cliente.FechaIngreso" />
+                    <ValidationMessage For="(() => Cliente.FechaIngreso)" />
+                </div>
+            </div>
+
+            @*footer*@
+            <div class="card-footer text-center mt-2">
+                <a href="/Cliente/Index" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Modificar</button>
+                <button type="button" class="btn btn-danger bi bi-trash" @onclick="Eliminar"> Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int ClienteId { get; set; }
+    public Clientes Cliente { get; set; } = new Clientes();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Cliente = await clientesService.Buscar(ClienteId);
+
+        if (Cliente == null)
+        {
+            toastService.ShowError("Cliente no encontrado.");
+            navigationManager.NavigateTo("/Cliente/Index");
+            return;
+        }
+    }
+
+    public async Task Modificar()
+    {
+        var modificado = await clientesService.Guardar(Cliente);
+
+        if (modificado)
+        {
+            toastService.ShowSuccess("Se ha modificado correctamente");
+        }
+        else
+        {
+            toastService.ShowError("No se ha podido modificar correctamente");
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        var eliminado = await clientesService.Eliminar(Cliente.ClienteId);
+
+        if (eliminado)
+        {
+            toastService.ShowSuccess("Se ha eliminado correctamente");
+            navigationManager.NavigateTo("/Cliente/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se ha podido eliminar correctamente");
+        }
+    }
+}
