@@ -65,12 +65,13 @@
                             <tr>
                                 <td>@sistema.SistemaId</td>
                                 <td>@sistema.Descripcion</td>
-                                <td>@sistema.Complegidad</td>
+                                <td>@sistema.Complejidad</td>
                                 <td class="text-center">
                                     <a href="/Sistema/Edit/@sistema.SistemaId" class="btn btn-outline-primary bi bi-pencil-square"></a>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-outline-danger bi bi-trash3" @onclick="() => Eliminar(sistema.SistemaId)"></button>
+                                    <a href="/Sistemas/Delete/@sistema.SistemaId" class="btn btn-outline-danger bi bi-trash3"></a>
+                                   
                                 </td>
                             </tr>
                         }
@@ -114,7 +115,7 @@
             }
             else if (Filtro == "Complejidad")
             {
-                ListaSistemas = await sistemasService.Listar(s => s.Complegidad.ToLower().Contains(ValorFiltro.ToLower()));
+                ListaSistemas = await sistemasService.Listar(s => s.Complejidad.ToLower().Contains(ValorFiltro.ToLower()));
             }
         }
         else

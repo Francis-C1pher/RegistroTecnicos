@@ -1,5 +1,62 @@
-﻿<h3>Delete</h3>
+﻿@page "/Sistemas/Delete/{SistemaId:int}"
+
+@inject SistemasService sistemasService
+@inject IToastService toastService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Sistema</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header text-center">
+            <h5 class="card-title">Eliminar Sistema</h5>
+        </div>
+
+        <div class="card-body text-center">
+            <p><strong>¿Está seguro de que desea eliminar el siguiente sistema?</strong></p>
+            <p><strong>ID:</strong> @Sistema.SistemaId</p>
+            <p><strong>Descripción:</strong> @Sistema.Descripcion</p>
+            <p><strong>Complejidad:</strong> @Sistema.Complejidad</p>
+        </div>
+
+        <div class="card-footer text-center mt-2">
+            <a href="/Sistemas/Index" class="btn btn-secondary">
+                <span class="bi bi-arrow-left"></span> Cancelar
+            </a>
+            <button class="btn btn-danger bi bi-trash" @onclick="ConfirmarEliminar"> Eliminar</button>
+        </div>
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas Sistema { get; set; } = new Sistemas();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Sistema = await sistemasService.Buscar(SistemaId);
+
+        if (Sistema == null)
+        {
+            toastService.ShowError("Sistema no encontrado.");
+            navigationManager.NavigateTo("/Sistemas/Index");
+            return;
+        }
+    }
+
+    private async Task ConfirmarEliminar()
+    {
+        var eliminado = await sistemasService.Eliminar(Sistema.SistemaId);
+
+        if (eliminado)
+        {
+            toastService.ShowSuccess("Sistema eliminado correctamente.");
+            navigationManager.NavigateTo("/Sistemas/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se pudo eliminar el sistema.");
+        }
+    }
 }

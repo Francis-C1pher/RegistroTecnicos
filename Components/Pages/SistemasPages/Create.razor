@@ -1,5 +1,86 @@
-﻿<h3>Create</h3>
+﻿@page "/Sistema/Create"
+@rendermode InteractiveServer
+@inject SistemasService sistemasService
+@inject NavigationManager navigationManager
+@inject IToastService toastService
+
+<PageTitle>Registrar Sistema</PageTitle>
+
+<EditForm Model="Sistema" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Registrar Sistema</h5>
+            </div>
+
+            <div class="card-body">
+                <!-- Sistema ID -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>ID Sistema</strong></label>
+                    <InputNumber disabled readonly class="form-control" @bind-Value="Sistema.SistemaId"></InputNumber>
+                    <ValidationMessage For="(() => Sistema.SistemaId)" />
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>Descripción</strong></label>
+                    <InputText class="form-control" @bind-Value="Sistema.Descripcion"></InputText>
+                    <ValidationMessage For="(() => Sistema.Descripcion)" />
+                </div>
+
+                <!-- Complejidad -->
+                <div class="mb-3">
+                    <label class="form-label"><strong>Complejidad</strong></label>
+                    <InputSelect class="form-control" @bind-Value="Sistema.Complejidad">
+                        <option value="" disabled selected>Seleccione una complejidad</option>
+                        <option value="Baja">Baja</option>
+                        <option value="Media">Media</option>
+                        <option value="Alta">Alta</option>
+                    </InputSelect>
+                    <ValidationMessage For="(() => Sistema.Complejidad)" />
+                </div>
+            </div>
+
+            <div class="card-footer text-center mt-2">
+                <a href="/Sistema/Index" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Guardar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+<p>@Mensaje</p>
 
 @code {
+    public Sistemas Sistema { get; set; } = new Sistemas();
+    public string Mensaje { get; set; } = string.Empty;
 
+    private async Task Guardar()
+    {
+        try
+        {
+            var creado = await sistemasService.Guardar(Sistema);
+
+            if (creado)
+            {
+                toastService.ShowSuccess("Sistema guardado correctamente");
+                navigationManager.NavigateTo("/Sistema/Index");
+            }
+            else
+            {
+                toastService.ShowError("No se pudo guardar el sistema");
+            }
+        }
+        catch (Exception ex)
+        {
+            Mensaje = $"Error: {ex.Message}";
+            toastService.ShowError("Ocurrió un error al guardar el sistema");
+        }
+    }
 }
+
