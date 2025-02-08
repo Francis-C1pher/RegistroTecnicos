@@ -1,0 +1,94 @@
+﻿@page "/Sistema/Edit/{SistemaId:int}"
+
+@inject SistemasService sistemasService
+@inject IToastService toastService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+@* HTML *@
+<PageTitle>Modificar Sistema</PageTitle>
+<EditForm Model="Sistema" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Modificar Sistema</h5>
+            </div>
+
+            <div class="card-body">
+                @* Descripción *@ 
+                <div class="mb-3">
+                    <label class="form-label"><strong>Descripción</strong></label>
+                    <InputText class="form-control" @bind-Value="Sistema.Descripcion"></InputText>
+                    <ValidationMessage For="(() => Sistema.Descripcion)" />
+                </div>
+
+                @* Complejidad *@ 
+                <div class="mb-3">
+                    <label class="form-label"><strong>Complejidad</strong></label>
+                    <InputText class="form-control" @bind-Value="Sistema.Complejidad"></InputText>
+                    <ValidationMessage For="(() => Sistema.Complejidad)" />
+                </div>
+            </div>
+
+            @* Footer *@ 
+            <div class="card-footer text-center mt-2">
+                <a href="/Sistema/Index" class="btn btn-secondary">
+                    <span class="bi bi-arrow-left"></span> Volver
+                </a>
+                <button type="submit" class="btn btn-primary bi bi-floppy"> Modificar</button>
+                <button type="button" class="btn btn-danger bi bi-trash" @onclick="Eliminar"> Eliminar</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas Sistema { get; set; } = new Sistemas();
+    public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Sistema = await sistemasService.Buscar(SistemaId);
+
+        if (Sistema == null)
+        {
+            toastService.ShowError("Sistema no encontrado.");
+            navigationManager.NavigateTo("/Sistema/Index");
+            return;
+        }
+    }
+
+    public async Task Modificar()
+    {
+        var modificado = await sistemasService.Guardar(Sistema);
+
+        if (modificado)
+        {
+            toastService.ShowSuccess("Se ha modificado correctamente");
+        }
+        else
+        {
+            toastService.ShowError("No se ha podido modificar correctamente");
+        }
+    }
+
+    private async Task Eliminar()
+    {
+        var eliminado = await sistemasService.Eliminar(Sistema.SistemaId);
+
+        if (eliminado)
+        {
+            toastService.ShowSuccess("Se ha eliminado correctamente");
+            navigationManager.NavigateTo("/Sistema/Index");
+        }
+        else
+        {
+            toastService.ShowError("No se ha podido eliminar correctamente");
+        }
+    }
+}

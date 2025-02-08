@@ -1,0 +1,135 @@
+﻿@page "/Sistema/Index"
+
+@inject SistemasService sistemasService
+@inject NavigationManager navigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Registro de Sistemas</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header space-between">
+            <h5 class="card-title">Registro de Sistemas</h5>
+            <a href="/Sistema/Create" class="btn btn-primary"> <span class="bi bi-plus-square mt-3"></span> Crear</a>
+        </div>
+
+        <div class="card-body">
+            @* Labels *@
+            <div class="row">
+                @* Filtrar por *@
+                <div class="col-3">
+                    <label class="col-form-label"><strong>Filtrar por</strong></label>
+                </div>
+
+                @* ValorFiltro *@
+                <div class="col-4">
+                    <label class="col-form-label"><strong>Búsqueda</strong></label>
+                </div>
+            </div>
+
+            @* Inputs y botones *@
+            <div class="row align-items-center">
+                @* Filtro *@
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opción</option>
+                        <option value="SistemaId">SistemaId</option>
+                        <option value="Descripcion">Descripción</option>
+                        <option value="Complejidad">Complejidad</option>
+                    </InputSelect>
+                </div>
+
+                @* Búsqueda *@
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover">
+                <thead class="table table-striped text-black">
+                    <tr>
+                        <th>SistemaId</th>
+                        <th>Descripción</th>
+                        <th>Complejidad</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ListaSistemas.Any())
+                    {
+                        @foreach (var sistema in ListaSistemas)
+                        {
+                            <tr>
+                                <td>@sistema.SistemaId</td>
+                                <td>@sistema.Descripcion</td>
+                                <td>@sistema.Complejidad</td>
+                                <td class="text-center">
+                                    <a href="/Sistema/Edit/@sistema.SistemaId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                                </td>
+                                <td class="text-center">
+                                    <a href="/Sistemas/Delete/@sistema.SistemaId" class="btn btn-outline-danger bi bi-trash3"></a>
+                                   
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">No existen Sistemas registrados</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer space-between">
+            <label>Cantidad: @ListaSistemas.Count()</label>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Sistemas> ListaSistemas { get; set; } = new List<Sistemas>();
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaSistemas = await sistemasService.Listar(s => s.SistemaId > 0); // Cargar todos los sistemas
+    }
+
+    private async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(ValorFiltro))
+        {
+            if (Filtro == "SistemaId")
+            {
+                ListaSistemas = await sistemasService.Listar(s => s.SistemaId.ToString().Contains(ValorFiltro));
+            }
+            else if (Filtro == "Descripcion")
+            {
+                ListaSistemas = await sistemasService.Listar(s => s.Descripcion.ToLower().Contains(ValorFiltro.ToLower()));
+            }
+            else if (Filtro == "Complejidad")
+            {
+                ListaSistemas = await sistemasService.Listar(s => s.Complejidad.ToLower().Contains(ValorFiltro.ToLower()));
+            }
+        }
+        else
+        {
+            ListaSistemas = await sistemasService.Listar(s => s.SistemaId > 0); // Restablecer la lista
+        }
+    }
+
+    private async Task Eliminar(int sistemaId)
+    {
+        var confirmado = await sistemasService.Eliminar(sistemaId);
+        if (confirmado)
+        {
+            ListaSistemas.RemoveAll(s => s.SistemaId == sistemaId);
+        }
+    }
+}
