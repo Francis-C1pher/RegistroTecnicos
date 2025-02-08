@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RegistroTecnicos.Components.Models
+namespace RegistroTecnicos.Models
 {
     public class Tickets
     {
@@ -14,7 +14,7 @@ namespace RegistroTecnicos.Components.Models
         [Required(ErrorMessage = "Este campo es requerido")]
         public string Prioridad { get; set; } = string.Empty;
         [Required(ErrorMessage = "Este campo es requerido")]
-        public string Asunto { get; set; } = string.Empty ;
+        public string Asunto { get; set; } = string.Empty;
         [Required(ErrorMessage = "Este campo es requerido")]
         public string Descripcion { get; set; } = string.Empty;
         [Required(ErrorMessage = "Este campo es requerido")]

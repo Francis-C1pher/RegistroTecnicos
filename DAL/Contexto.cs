@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RegistroTecnicos.Components.Models;
 using RegistroTecnicos.Models;
 
 

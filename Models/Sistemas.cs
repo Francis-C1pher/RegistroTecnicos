@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-namespace RegistroTecnicos.Components.Models
+namespace RegistroTecnicos.Models
 
 {
     public class Sistemas

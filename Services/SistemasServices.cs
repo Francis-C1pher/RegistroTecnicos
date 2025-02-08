@@ -1,8 +1,8 @@
 ﻿using RegistroTecnicos.DAL;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using RegistroTecnicos.Components.Models;
 using Microsoft.Extensions.Logging;
+using RegistroTecnicos.Models;
 
 namespace RegistroTecnicos.Services;
 
